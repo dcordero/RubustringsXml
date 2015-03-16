@@ -22,6 +22,11 @@ class Rubustrings
     @base_strings_hash = load_strings @base_strings_file_path
     @translated_strings_hash = load_strings @translated_strings_file_path
 
+    puts "\nProcessing files:".blue
+    puts " - #{@base_strings_file_path}".blue
+    puts " - #{@translated_strings_file_path}\n".blue
+
+    validation_result = true
     @base_strings_hash.each do |key, value|
       translated_value = @translated_strings_hash[key]
       
@@ -37,7 +42,9 @@ class Rubustrings
       validation_special_ending  = validate_special_ending value, translated_value
       puts "✘ Error, special ending mismatch: #{value} - #{translated_value}".red unless validation_special_ending
 
+      validation_result &= validation_special_characters && validation_special_beginning && validation_special_ending
     end
+    return validation_result
   end
 
 private
@@ -88,5 +95,15 @@ end
 abort "Syntax error: ./rubustringsxml base_strings_file translated_strings_file" if (ARGV.size != 2)
 
 rubustrings = Rubustrings.new ARGV[0], ARGV[1]
-rubustrings.validate
+validation_result = rubustrings.validate
+
+if validation_result
+  puts "\nResult: ✓ Strings file validated succesfully\n".bold.green
+  exit 0
+else
+  puts "\nResult: ✘ Some errors detected\n".bold.red
+  exit 1
+end
+
+
 
