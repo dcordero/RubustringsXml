@@ -26,15 +26,24 @@ It also warning on:
 ```
 dcordero@silver:~$ ./rubustringsxml res/values/strings.xml res/values-es/strings.xml
 
+Processing files:
+ - res/values/strings.xml
+ - res/values-es/strings.xml
+ 
 ✘ Error, number of variables mismatch: Phone %s - Teléfono
-✘ Error, special beginning mismatch: \nTubasa - Transportes Urbanos de Badajoz
-⊗ Warning, translation significantly large: \nTubasa - Transportes Urbanos de Badajoz
+✘ Error, special beginning mismatch: \nWeb - Web
+⊗ Warning, translation significantly large: Tubasa - Transportes Urbanos de Badajoz
 
 ✘ Some errors detected
 ```
 
 ```
 dcordero@silver:~$ ./rubustringsxml res/values/strings.xml res/values-es/strings.xml
+
+Processing files:
+ - res/values/strings.xml
+ - res/values-es/strings.xml
+ 
 ✓ Strings files validated succesfully
 ```
 
