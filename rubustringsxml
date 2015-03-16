@@ -1,0 +1,92 @@
+#!/usr/bin/env ruby
+
+%w[colored nokogiri].each do |this_gem|
+  begin
+    require this_gem
+  rescue LoadError
+    abort "Please install the '#{this_gem}' gem."
+  end
+end
+
+class Rubustrings
+
+  def initialize(base_strings_file_path, translated_strings_file_path)
+    abort "Error: #{base_strings_file_path} not found" if not File.exist?(base_strings_file_path)
+    abort "Error: #{translated_strings_file_path} not found" if not File.exist?(translated_strings_file_path)
+
+    @base_strings_file_path = base_strings_file_path
+    @translated_strings_file_path = translated_strings_file_path
+  end
+
+  def validate
+    @base_strings_hash = load_strings @base_strings_file_path
+    @translated_strings_hash = load_strings @translated_strings_file_path
+
+    @base_strings_hash.each do |key, value|
+      translated_value = @translated_strings_hash[key]
+      
+      validation_length = validate_length value, translated_value
+      puts "⊗ Warning, translation significantly large: #{value} - #{translated_value}".yellow unless validation_length
+
+      validation_special_characters = validate_special_characters value, translated_value
+      puts "✘ Error, number of variables mismatch: #{value} - #{translated_value}".red unless validation_special_characters
+
+      validation_special_beginning = validate_special_beginning value, translated_value
+      puts "✘ Error, special beginning mismatch: #{value} - #{translated_value}".red unless validation_special_beginning
+
+      validation_special_ending  = validate_special_ending value, translated_value
+      puts "✘ Error, special ending mismatch: #{value} - #{translated_value}".red unless validation_special_ending
+
+    end
+  end
+
+private
+
+  def load_strings(file_path)
+    base_strings_xml = open_and_read_file file_path
+    loaded_strings = Hash.new
+    base_strings_xml.xpath("//string").each do |line|
+      loaded_strings[line.attr('name')] = line.text
+    end
+    return loaded_strings
+  end
+
+  def open_and_read_file(file_name)
+    begin
+      Nokogiri::XML(File.open(file_name, 'r')) { |config| config.strict }
+    rescue Nokogiri::XML::SyntaxError => e
+      abort "Format error in #{file_name}: #{e}"
+    end
+  end
+
+  def validate_length(translation_key, translation_value)
+    translation_value.length / translation_key.length < 3
+  end
+
+  def validate_special_characters(translation_key, translation_value)
+    variables_regex = /%[hlqLztj]?[@%dDuUxXoOfeEgGcCsSpaAF]/
+    key_variables = translation_key.scan(variables_regex)
+    value_variables = translation_value.scan(variables_regex)
+
+    return key_variables.sort == value_variables.sort
+  end
+
+  def validate_special_beginning(translation_key, translation_value)
+    beginning_regex = /^(?:\\s|\\n|\\r)/
+    return true unless translation_key =~ beginning_regex || translation_value =~ beginning_regex
+    translation_key.chars.first == translation_value.chars.first
+  end
+
+  def validate_special_ending(translation_key, translation_value)
+    ending_regex = /(?:\\s|\\n|\\r)$/
+    return true unless translation_key =~ ending_regex || translation_value =~ ending_regex
+    translation_key.chars.last == translation_value.chars.last
+  end
+
+end
+
+abort "Syntax error: ./rubustringsxml base_strings_file translated_strings_file" if (ARGV.size != 2)
+
+rubustrings = Rubustrings.new ARGV[0], ARGV[1]
+rubustrings.validate
+
