@@ -2,6 +2,8 @@
 
 Check the format and consistency of the strings.xml files of Android Apps with multi-language support
 
+[Rubustrings](https://github.com/dcordero/Rubustrings) is also available for iOS [here](https://github.com/dcordero/Rubustrings) 
+
 ## Usage
 
 It only needs the base strings.xml file and a translated strings.xml file as arguments
