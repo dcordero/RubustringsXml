@@ -31,16 +31,16 @@ class Rubustrings
       translated_value = @translated_strings_hash[key]
       
       validation_length = validate_length value, translated_value
-      puts "⊗ Warning, translation significantly large: #{value} - #{translated_value}".yellow unless validation_length
+      puts "⊗ Warning, translation significantly large: \"#{value}\" - \"#{translated_value}\"".yellow unless validation_length
 
       validation_special_characters = validate_special_characters value, translated_value
-      puts "✘ Error, number of variables mismatch: #{value} - #{translated_value}".red unless validation_special_characters
+      puts "✘ Error, number of variables mismatch: \"#{value}\" - \"#{translated_value}\"".red unless validation_special_characters
 
       validation_special_beginning = validate_special_beginning value, translated_value
-      puts "✘ Error, special beginning mismatch: #{value} - #{translated_value}".red unless validation_special_beginning
+      puts "✘ Error, special beginning mismatch: \"#{value}\" - \"#{translated_value}\"".red unless validation_special_beginning
 
       validation_special_ending  = validate_special_ending value, translated_value
-      puts "✘ Error, special ending mismatch: #{value} - #{translated_value}".red unless validation_special_ending
+      puts "✘ Error, special ending mismatch: \"#{value}\" - \"#{translated_value}\"".red unless validation_special_ending
 
       validation_result &= validation_special_characters && validation_special_beginning && validation_special_ending
     end
@@ -79,7 +79,7 @@ private
   end
 
   def validate_special_beginning(translation_key, translation_value)
-    beginning_regex = /^(?:\\s|\\n|\\r)/
+    beginning_regex = /^(?:\s|\\n|\\r)/
     return true unless translation_key =~ beginning_regex || translation_value =~ beginning_regex
     translation_key.chars.first == translation_value.chars.first
   end
